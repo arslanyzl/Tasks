@@ -6,14 +6,22 @@
 //
 
 
-// AddTaskView.swift
 import SwiftUI
 
 struct AddTaskView: View {
     @Binding var isPresented: Bool
-    @Binding var title: String
-    @Binding var description: String
-    let onAdd: () -> Void
+    @State var title: String = ""
+    @State var description: String = ""
+    var taskToEdit: Task?
+    let onSave: (Task) -> Void
+
+    init(isPresented: Binding<Bool>, taskToEdit: Task? = nil, onSave: @escaping (Task) -> Void) {
+        self._isPresented = isPresented
+        self.taskToEdit = taskToEdit
+        self.onSave = onSave
+        _title = State(initialValue: taskToEdit?.title ?? "")
+        _description = State(initialValue: taskToEdit?.description ?? "")
+    }
     
     var body: some View {
         NavigationView {
@@ -23,29 +31,28 @@ struct AddTaskView: View {
                     TextField("Description", text: $description)
                 }
             }
-            .navigationTitle("Add Task")
+            .navigationTitle(taskToEdit == nil ? "Add Task" : "Edit Task")
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        isPresented = false
+                ToolbarItem(placement: .topBarTrailing) {
+                    HStack {
+                        Button(taskToEdit == nil ? "Add" : "Save") {
+                            let updatedTask = Task(id: taskToEdit?.id ?? UUID(), title: title, description: description, isCompleted: taskToEdit?.isCompleted ?? false)
+                            onSave(updatedTask)
+                            isPresented = false
+                        }
+                        .disabled(title.isEmpty)
                     }
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Add") {
-                        onAdd()
-                    }
-                    .disabled(title.isEmpty)
                 }
             }
         }
     }
 }
 
-#Preview {
-    AddTaskView(
-        isPresented: .constant(true),
-        title: .constant("New Task"),
-        description: .constant("Task description goes here"),
-        onAdd: {}
-    )
-}
+
+//#Preview {
+//    AddTaskView(
+//        isPresented: .constant(true),
+//        taskToEdit: Task(title: "Clean", description: "Work"),
+//        onSave: { _ in }
+//    )
+//}

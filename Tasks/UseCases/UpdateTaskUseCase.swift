@@ -6,18 +6,14 @@
 //
 
 
-protocol UpdateTaskUseCase {
-    func execute(task: Task) -> Bool
-}
-
-class UpdateTaskUseCaseImpl: UpdateTaskUseCase {
+class UpdateTaskUseCase {
     private let repository: TaskRepository
     
     init(repository: TaskRepository) {
         self.repository = repository
     }
     
-    func execute(task: Task) -> Bool {
-        return repository.updateTask(task: task)
+    func execute(task: Task) {
+        repository.updateTask(task)
     }
 }

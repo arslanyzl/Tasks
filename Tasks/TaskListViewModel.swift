@@ -6,30 +6,39 @@
 //
 
 
-// TaskListViewModel.swift
 import SwiftUI
 
 class TaskListViewModel: ObservableObject {
-    private var presenter: TaskListPresenterProtocol
-    
     @Published var tasks: [Task] = []
     
-    init(presenter: TaskListPresenterProtocol) {
-        self.presenter = presenter
-        self.presenter.onTasksUpdated = { [weak self] in
-            self?.tasks = self?.presenter.tasks ?? []
-        }
+    private let getTasksUseCase: GetTasksUseCase
+    private let addTaskUseCase: AddTaskUseCase
+    private let updateTaskUseCase: UpdateTaskUseCase
+    
+    init(getTasksUseCase: GetTasksUseCase, addTaskUseCase: AddTaskUseCase, updateTaskUseCase: UpdateTaskUseCase) {
+        self.getTasksUseCase = getTasksUseCase
+        self.addTaskUseCase = addTaskUseCase
+        self.updateTaskUseCase = updateTaskUseCase
+        loadTasks()
     }
     
-    func viewDidLoad() {
-        presenter.viewDidLoad()
+    func loadTasks() {
+        tasks = getTasksUseCase.execute()
     }
     
     func addTask(title: String, description: String) {
-        presenter.addTask(title: title, description: description)
+        addTaskUseCase.execute(title: title, description: description)
+        loadTasks()
     }
     
-    func toggleTaskCompletion(task: Task) {
-        presenter.toggleTaskCompletion(task: task)
+    func updateTask(_ task: Task) {
+        updateTaskUseCase.execute(task: task)
+        loadTasks()
+    }
+    
+    func toggleTaskCompletion(_ task: Task) {
+        var updatedTask = task
+        updatedTask.isCompleted.toggle()
+        updateTask(updatedTask)
     }
 }

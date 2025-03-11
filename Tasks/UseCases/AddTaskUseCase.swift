@@ -5,19 +5,17 @@
 //  Created by Arslan Yazlyyev on 3/8/25.
 //
 
+import Foundation
 
-protocol AddTaskUseCase {
-    func execute(task: Task) -> Bool
-}
-
-class AddTaskUseCaseImpl: AddTaskUseCase {
+class AddTaskUseCase {
     private let repository: TaskRepository
     
     init(repository: TaskRepository) {
         self.repository = repository
     }
     
-    func execute(task: Task) -> Bool {
-        return repository.addTask(task: task)
+    func execute(title: String, description: String) {
+        let task = Task(id: UUID(), title: title, description: description)
+        repository.addTask(task)
     }
 }

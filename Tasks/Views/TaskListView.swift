@@ -8,39 +8,36 @@
 
 import SwiftUI
 
-// Updated TaskListView.swift
-import SwiftUI
-
 struct TaskListView: View {
-    // State management
-    @State private var tasks: [Task] = []
+    @StateObject private var viewModel: TaskListViewModel
     @State private var showingAddTask = false
     @State private var newTaskTitle = ""
     @State private var newTaskDescription = ""
     
-    // Use cases
-    private let getTasksUseCase: GetTasksUseCase
-    private let addTaskUseCase: AddTaskUseCase
-    private let updateTaskUseCase: UpdateTaskUseCase
-    
-    init(getTasksUseCase: GetTasksUseCase,
-         addTaskUseCase: AddTaskUseCase,
-         updateTaskUseCase: UpdateTaskUseCase) {
-        self.getTasksUseCase = getTasksUseCase
-        self.addTaskUseCase = addTaskUseCase
-        self.updateTaskUseCase = updateTaskUseCase
+    init() {
+        let repository = TaskRepositoryImpl()
+        let getTasksUseCase = GetTasksUseCase(repository: repository)
+        let addTaskUseCase = AddTaskUseCase(repository: repository)
+        let updateTaskUseCase = UpdateTaskUseCase(repository: repository)
+        _viewModel = StateObject(wrappedValue: TaskListViewModel(getTasksUseCase: getTasksUseCase, addTaskUseCase: addTaskUseCase, updateTaskUseCase: updateTaskUseCase))
     }
     
     var body: some View {
         NavigationView {
             List {
-                ForEach(tasks) { task in
-                    NavigationLink(destination: TaskView(
-                        task: task,
-                        onToggleCompletion: toggleTaskCompletion
-                    )) {
-                        TaskRow(task: task) {
-                            toggleTaskCompletion(task: task)
+                ForEach(viewModel.tasks) { task in
+                    NavigationLink(destination: TaskView(task: task, onToggleCompletion: { updatedTask in
+                        viewModel.toggleTaskCompletion(updatedTask)
+                    }, onUpdateTask: { updatedTask in
+                        viewModel.updateTask(updatedTask)
+                    })) {
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(task.title).font(.headline)
+                                Text(task.description).font(.subheadline)
+                            }
+                            Spacer()
+                            Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
                         }
                     }
                 }
@@ -58,76 +55,22 @@ struct TaskListView: View {
             .sheet(isPresented: $showingAddTask) {
                 AddTaskView(
                     isPresented: $showingAddTask,
-                    title: $newTaskTitle,
-                    description: $newTaskDescription,
-                    onAdd: {
-                        if !newTaskTitle.isEmpty {
-                            addTask()
-                        }
+                    onSave: { task in
+                        viewModel.addTask(
+                            title: task.title,
+                            description: task.description
+                        )
+                        showingAddTask = false
                     }
                 )
             }
-            .onAppear {
-                loadTasks()
-            }
-        }
-    }
-    
-    // Use case execution functions
-    private func loadTasks() {
-        tasks = getTasksUseCase.execute()
-    }
-    
-    private func addTask() {
-        let newTask = Task(title: newTaskTitle, description: newTaskDescription)
-        let success = addTaskUseCase.execute(task: newTask)
-        
-        if success {
-            newTaskTitle = ""
-            newTaskDescription = ""
-            showingAddTask = false
-            loadTasks()
-        }
-    }
-    
-    private func toggleTaskCompletion(task: Task) {
-        var updatedTask = task
-        updatedTask.isCompleted.toggle()
-        
-        let success = updateTaskUseCase.execute(task: updatedTask)
-        
-        if success {
-            loadTasks()
         }
     }
 }
 
-#Preview {
-    class MockGetTasksUseCase: GetTasksUseCase {
-        func execute() -> [Task] {
-            return [
-                Task(id: UUID(), title: "Learn Clean Architecture", description: "Study the principles", isCompleted: false),
-                Task(id: UUID(), title: "Implement SwiftUI App", description: "Create a sample app", isCompleted: true),
-                Task(id: UUID(), title: "Write Unit Tests", description: "Test all components", isCompleted: false)
-            ]
-        }
+// MARK: - Preview
+struct TaskListView_Previews: PreviewProvider {
+    static var previews: some View {
+        TaskListView()
     }
-
-    class MockAddTaskUseCase: AddTaskUseCase {
-        func execute(task: Task) -> Bool {
-            return true
-        }
-    }
-
-    class MockUpdateTaskUseCase: UpdateTaskUseCase {
-        func execute(task: Task) -> Bool {
-            return true
-        }
-    }
-    
-    return TaskListView(
-        getTasksUseCase: MockGetTasksUseCase(),
-        addTaskUseCase: MockAddTaskUseCase(),
-        updateTaskUseCase: MockUpdateTaskUseCase()
-    )
 }

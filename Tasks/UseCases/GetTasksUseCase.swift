@@ -7,11 +7,7 @@
 
 import Foundation
 
-protocol GetTasksUseCase {
-    func execute() -> [Task]
-}
-
-class GetTasksUseCaseImpl: GetTasksUseCase {
+class GetTasksUseCase {
     private let repository: TaskRepository
     
     init(repository: TaskRepository) {

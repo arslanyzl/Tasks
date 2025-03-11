@@ -13,25 +13,7 @@ struct TasksApp: App {
     
     var body: some Scene {
         WindowGroup {
-            // Set up the chain of dependencies
-            let getTasksUseCase = GetTasksUseCaseImpl(repository: repository)
-            let addTaskUseCase = AddTaskUseCaseImpl(repository: repository)
-            let updateTaskUseCase = UpdateTaskUseCaseImpl(repository: repository)
-            
-            let presenter = TaskListPresenter(
-                getTasksUseCase: getTasksUseCase,
-                addTaskUseCase: addTaskUseCase,
-                updateTaskUseCase: updateTaskUseCase
-            )
-            
-            let viewModel = TaskListViewModel(presenter: presenter)
-            
-            // Create the main view with injected dependencies
-            TaskListView(
-                getTasksUseCase: getTasksUseCase,
-                addTaskUseCase: addTaskUseCase,
-                updateTaskUseCase: updateTaskUseCase
-            )
+            TaskListView()
         }
     }
 }

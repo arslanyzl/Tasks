@@ -8,8 +8,8 @@
 import Foundation
 
 protocol TaskRepository {
+    func toggleTaskCompletion(task: Task)
     func getTasks() -> [Task]
-    func addTask(task: Task) -> Bool
-    func updateTask(task: Task) -> Bool
-    func deleteTask(id: UUID) -> Bool
+    func addTask(_ task: Task)
+    func updateTask(_ task: Task)
 }
