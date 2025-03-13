@@ -8,12 +8,6 @@ Clean Architecture divides our application into three primary layers:
 2. Data Layer - Data storage and retrieval
 3. Presentation Layer - User interface elements
 
-**Clean Architecture Diagram**
-
-Here's a visual representation of our architecture:
-
-<img width="279" alt="Screenshot 2025-03-09 at 12 31 20 PM" src="https://github.com/user-attachments/assets/ce09332a-d5e1-487e-b426-d019c3cbaf2c" />
-
 **Key Benefits of This Architecture**
 
 Testability: Each component can be tested in isolation with mock dependencies
