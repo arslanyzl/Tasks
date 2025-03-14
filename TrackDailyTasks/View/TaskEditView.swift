@@ -37,9 +37,10 @@ struct TaskEditView: View {
             Form {
                 Section(header: Text("Task Details")) {
                     TextField("Title", text: $title)
-                    
-                    TextField("Description", text: $description)
-                    
+                        .textFieldStyle(.roundedBorder)
+                    TextField("Description", text: $description, axis: .vertical)
+                        .lineLimit(5, reservesSpace: true)
+                        .textFieldStyle(.roundedBorder)
                     DatePicker("Date", selection: $date, displayedComponents: .date)
                 }
                 
