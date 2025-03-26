@@ -39,10 +39,11 @@ struct TaskEditView: View {
                     TextField("Title", text: $title)
                         .textFieldStyle(.roundedBorder)
                     TextField("Description", text: $description, axis: .vertical)
-                        .lineLimit(5, reservesSpace: true)
+                        .lineLimit(7, reservesSpace: true)
                         .textFieldStyle(.roundedBorder)
                     DatePicker("Date", selection: $date, displayedComponents: .date)
                 }
+                .padding(.all, 12)
                 
                 Section(header: Text("Priority")) {
                     Picker("Priority", selection: $priority) {
@@ -94,4 +95,11 @@ struct TaskEditView: View {
         onSave(task)
         presentationMode.wrappedValue.dismiss()
     }
+}
+
+#Preview {
+    TaskEditView(
+        task: Task(title: "Test", date: Date()),
+        onSave: { _ in }
+    )
 }
