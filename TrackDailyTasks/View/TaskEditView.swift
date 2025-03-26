@@ -99,7 +99,11 @@ struct TaskEditView: View {
 
 #Preview {
     TaskEditView(
-        task: Task(title: "Test", date: Date()),
+        task: Task(
+            title: "iOS Development",
+            description: "Clean architecture",
+            date: Date()
+        ),
         onSave: { _ in }
     )
 }
